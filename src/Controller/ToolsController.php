@@ -16,7 +16,7 @@ class ToolsController extends AppController
     public function initialize()
     {
         parent::initialize();
-        $this->Auth->allow(['add', 'token', 'view']);
+        $this->Auth->allow(['add', 'token', 'view', 'delete']);
     }
     
     /**
@@ -43,7 +43,9 @@ class ToolsController extends AppController
      */
     public function view($id = null)
     {
-        $tools = $this->Tools->find();
+        $tools = $this->Tools->find('all', [
+            'order' => ['Tools.created' => 'DESC']
+        ]);
 
         echo json_encode($tools);
 
@@ -104,16 +106,19 @@ class ToolsController extends AppController
      * @return \Cake\Http\Response|null Redirects to index.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function delete($id = null)
+    public function delete()
     {
-        $this->request->allowMethod(['post', 'delete']);
-        $tool = $this->Tools->get($id);
+        // $id = $this->request->data['id'];
+        // echo json_encode($this->request->data);
+        $id = $this->request->data[0];
+        var_dump($id);
+        // die;
+        $tool = $this->Tools->get($id);    
+        
         if ($this->Tools->delete($tool)) {
-            $this->Flash->success(__('The tool has been deleted.'));
+            echo json_encode('1');
         } else {
-            $this->Flash->error(__('The tool could not be deleted. Please, try again.'));
+            echo json_encode('0');
         }
-
-        return $this->redirect(['action' => 'index']);
     }
 }
